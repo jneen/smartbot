@@ -5,9 +5,9 @@ import smartbot._
 
 class SmartbotSpec extends Specification {
   "Smartbot" should {
-    "fail" in {
-      1 must be_==(1)
+    "create an empty one" in {
+      val empty = Smartbot.MarkovDict.empty()
+      empty.links size should be_==(0)
     }
   }
-
 }

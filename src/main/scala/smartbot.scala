@@ -41,6 +41,15 @@ object Smartbot {
     }
   }
 
-  class Markov(val links: mutable.Map[Array[String], Histogram], val inits: ListBuffer[Array[String]]) {
+  MarkovDict.empty
+
+  class MarkovDict(links: mutable.Map[Array[String], Histogram],
+                   inits: ListBuffer[Array[String]]) {
+  }
+
+  object MarkovDict {
+    def empty() {
+      new MarkovDict(mutable.Map[Array[String], Histogram](), ListBuffer())
+    }
   }
 }
