@@ -2,6 +2,7 @@ package smartbot
 
 import scala.collection.mutable
 import scala.util.Random
+import scala.collection.mutable.ListBuffer
 
 object Smartbot {
   def main(args: Array[String]) {

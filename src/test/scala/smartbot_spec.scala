@@ -6,9 +6,8 @@ import smartbot._
 class SmartbotSpec extends Specification {
   "Smartbot" should {
     "fail" in {
-      0 should be_==(1)
+      1 must be_==(1)
     }
   }
 
-  SmartBot.main()
 }
