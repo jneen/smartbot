@@ -43,12 +43,20 @@ object Smartbot {
 
   MarkovDict.empty
 
-  class MarkovDict(links: mutable.Map[Array[String], Histogram],
-                   inits: ListBuffer[Array[String]]) {
+  class MarkovDict(val links: mutable.Map[Array[String], Histogram],
+                   val inits: ListBuffer[Array[String]]) {
+
+    def train(sentence: String) = {
+
+    }
+
+    def tokenize(str: String): List[String] = {
+      List("Hi")
+    }
   }
 
   object MarkovDict {
-    def empty() {
+    def empty() = {
       new MarkovDict(mutable.Map[Array[String], Histogram](), ListBuffer())
     }
   }
