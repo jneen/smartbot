@@ -5,7 +5,7 @@ import scala.util.Random
 import scala.collection.mutable.ListBuffer
 
 object Smartbot {
-  def main(args: Array[String]) {
+  def main(args: List[String]) {
     println("Hello, world!")
   }
 
@@ -41,23 +41,29 @@ object Smartbot {
     }
   }
 
-  MarkovDict.empty
+  class MarkovDict(val depth: Int,
+                   val links: mutable.Map[List[String], Histogram],
+                   val inits: ListBuffer[List[String]]) {
 
-  class MarkovDict(val links: mutable.Map[Array[String], Histogram],
-                   val inits: ListBuffer[Array[String]]) {
+    def linkFor(pattern: List[String]) : Histogram = {
+      links.getOrElseUpdate(pattern, { new Histogram })
+    }
 
     def train(sentence: String) = {
-
+      val tokens = tokenize(sentence)
+      tokens.sliding(depth+1).foreach { seq =>
+        linkFor(seq.take(depth)).addWord(seq.last)
+      }
     }
 
     def tokenize(str: String): List[String] = {
-      List("Hi")
+      str.split(" ") toList
     }
   }
 
   object MarkovDict {
-    def empty() = {
-      new MarkovDict(mutable.Map[Array[String], Histogram](), ListBuffer())
+    def empty(depth: Int) = {
+      new MarkovDict(depth, mutable.Map[List[String], Histogram](), ListBuffer())
     }
   }
 }
