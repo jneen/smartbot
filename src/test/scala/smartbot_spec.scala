@@ -32,5 +32,11 @@ class SmartbotSpec extends Specification {
       dict.links.size must be_!=(0)
       dict.links must haveKey(List("what", "up", "bitches"))
     }
+
+    "generateSentence" in {
+      val dict = Smartbot.MarkovDict.empty(3)
+      dict.train("a sentence with words")
+      dict.generateSentence("a sentence with") must be_==("a sentence with words")
+    }
   }
 }

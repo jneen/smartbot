@@ -4,6 +4,8 @@ import scala.collection.mutable
 import scala.util.Random
 import scala.collection.mutable.ListBuffer
 import smartbot.LogParser._
+import scala.annotation.tailrec
+
 
 object Smartbot {
   def main(args: List[String]) {
@@ -45,8 +47,8 @@ object Smartbot {
                    val links: mutable.Map[List[String], Histogram],
                    val inits: ListBuffer[List[String]]) {
 
-    def linkFor(pattern: List[String]) : Histogram = {
-      links.getOrElseUpdate(pattern, { new Histogram })
+    def linkFor(pattern: Array[String]) : Histogram = {
+      links.getOrElseUpdate(pattern toList, { new Histogram })
     }
 
     def train(sentence: String) = {
@@ -61,8 +63,26 @@ object Smartbot {
       messages.foreach { train(_) }
     }
 
-    def tokenize(str: String): List[String] = {
-      str.split(" ") toList
+    def tokenize(str: String): Array[String] = {
+      str.split(" ")
+    }
+
+    def detokenize(tokens: Array[String]): String = {
+      tokens.mkString(" ")
+    }
+
+    @tailrec
+    private def generateFromTokens(tokens: Array[String]) : String = {
+      if (tokens.size > 50) return detokenize(tokens)
+
+      links.get(tokens.takeRight(depth) toList) match {
+        case Some(hist) => generateFromTokens(tokens :+ hist.sample)
+        case _ => detokenize(tokens)
+      }
+    }
+
+    def generateSentence(seed: String) : String = {
+      generateFromTokens(tokenize(seed))
     }
   }
 
