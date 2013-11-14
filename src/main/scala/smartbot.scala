@@ -45,8 +45,8 @@ object Smartbot {
                    val links: mutable.Map[List[String], Histogram],
                    val inits: ListBuffer[List[String]]) {
 
-    def linkFor(pattern: List[String]) : Histogram = {
-      links.getOrElseUpdate(pattern, { new Histogram })
+    def linkFor(pattern: Array[String]) : Histogram = {
+      links.getOrElseUpdate(pattern toList, { new Histogram })
     }
 
     def train(sentence: String) = {
@@ -56,19 +56,19 @@ object Smartbot {
       }
     }
 
-    def tokenize(str: String): List[String] = {
-      str.split(" ") toList
+    def tokenize(str: String): Array[String] = {
+      str.split(" ")
     }
 
-    def detokenize(tokens: List[String]): String = {
+    def detokenize(tokens: Array[String]): String = {
       tokens.mkString(" ")
     }
 
     @tailrec
-    private def generateFromTokens(tokens: List[String]) : String = {
+    private def generateFromTokens(tokens: Array[String]) : String = {
       if (tokens.size > 50) return detokenize(tokens)
 
-      links.get(tokens.takeRight(depth)) match {
+      links.get(tokens.takeRight(depth) toList) match {
         case Some(hist) => generateFromTokens(tokens :+ hist.sample)
         case _ => detokenize(tokens)
       }
