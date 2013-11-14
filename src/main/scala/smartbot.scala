@@ -3,6 +3,7 @@ package smartbot
 import scala.collection.mutable
 import scala.util.Random
 import scala.collection.mutable.ListBuffer
+import smartbot.LogParser._
 
 object Smartbot {
   def main(args: List[String]) {
@@ -53,6 +54,11 @@ object Smartbot {
       tokens.sliding(depth+1).foreach { seq =>
         linkFor(seq.take(depth)).addWord(seq.last)
       }
+    }
+
+    def trainFromLog(file: String) = {
+      val messages = getMessages(file)
+      messages.foreach { train(_) }
     }
 
     def tokenize(str: String): List[String] = {

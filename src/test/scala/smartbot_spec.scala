@@ -4,6 +4,7 @@ import org.specs._
 import smartbot._
 
 class SmartbotSpec extends Specification {
+
   "Smartbot" should {
     "create an empty one" in {
       val empty = Smartbot.MarkovDict.empty(2)
@@ -22,6 +23,14 @@ class SmartbotSpec extends Specification {
 
       hist.size must be_==(1)
       hist.sample must be_==("and")
+    }
+
+    "train from log messages" in {
+      val dict = Smartbot.MarkovDict.empty(3)
+      val testFile = "examples/irc_log.log"
+      dict.trainFromLog(testFile)
+      dict.links.size must be_!=(0)
+      dict.links must haveKey(List("what", "up", "bitches"))
     }
   }
 }
