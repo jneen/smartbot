@@ -28,7 +28,7 @@ object Smartbot {
       val chosenPair = words.find { pair =>
         val word = pair._1
         val score = pair._2
-        if (count < rand) {
+        if (count >= rand) {
           true
         }
         else {
