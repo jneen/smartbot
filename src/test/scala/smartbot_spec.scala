@@ -23,5 +23,11 @@ class SmartbotSpec extends Specification {
       hist.size must be_==(1)
       hist.sample must be_==("and")
     }
+
+    "generateSentence" in {
+      val dict = Smartbot.MarkovDict.empty(3)
+      dict.train("a sentence with words")
+      dict.generateSentence("a sentence with") must be_==("a sentence with words")
+    }
   }
 }

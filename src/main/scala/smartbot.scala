@@ -3,6 +3,7 @@ package smartbot
 import scala.collection.mutable
 import scala.util.Random
 import scala.collection.mutable.ListBuffer
+import scala.annotation.tailrec
 
 object Smartbot {
   def main(args: List[String]) {
@@ -57,6 +58,24 @@ object Smartbot {
 
     def tokenize(str: String): List[String] = {
       str.split(" ") toList
+    }
+
+    def detokenize(tokens: List[String]): String = {
+      tokens.mkString(" ")
+    }
+
+    @tailrec
+    private def generateFromTokens(tokens: List[String]) : String = {
+      if (tokens.size > 50) return detokenize(tokens)
+
+      links.get(tokens.takeRight(depth)) match {
+        case Some(hist) => generateFromTokens(tokens :+ hist.sample)
+        case _ => detokenize(tokens)
+      }
+    }
+
+    def generateSentence(seed: String) : String = {
+      generateFromTokens(tokenize(seed))
     }
   }
 
