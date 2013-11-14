@@ -21,7 +21,6 @@ object Smartbot {
     }
 
     // weighted random
-    // TODO: halp how do i scala
     def sample: String = {
       val rand = randGen.nextInt(size)
       var count = 0
