@@ -3,17 +3,17 @@ package test
 import org.specs._
 import smartbot._
 
-class SmartbotSpec extends Specification {
+class MarkovDictSpec extends Specification {
 
-  "Smartbot" should {
+  "Markov dict" should {
     "create an empty one" in {
-      val empty = Smartbot.MarkovDict.empty(2)
+      val empty = MarkovDict.empty(2)
       empty.depth must be_==(2)
       empty.links.size must be_==(0)
     }
 
     "train" in {
-      val dict = Smartbot.MarkovDict.empty(3)
+      val dict = MarkovDict.empty(3)
       dict.train("a sentence with words and stuff")
       dict.links.size must be_==(3)
       dict.links must haveKey(List("a", "sentence", "with"))
@@ -26,7 +26,7 @@ class SmartbotSpec extends Specification {
     }
 
     "train from log messages" in {
-      val dict = Smartbot.MarkovDict.empty(3)
+      val dict = MarkovDict.empty(3)
       val testFile = "examples/irc_log.log"
       dict.trainFromLog(testFile)
       dict.links.size must be_!=(0)
@@ -34,7 +34,7 @@ class SmartbotSpec extends Specification {
     }
 
     "generateSentence" in {
-      val dict = Smartbot.MarkovDict.empty(3)
+      val dict = MarkovDict.empty(3)
       dict.train("a sentence with words")
       dict.generateSentence("a sentence with") must be_==("a sentence with words")
     }
