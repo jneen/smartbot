@@ -43,7 +43,7 @@ object Smartbot {
     }
   }
 
-  class MarkovDict(val depth: Int,
+  class MarkovDict(var depth: Int,
                    val links: mutable.Map[List[String], Histogram],
                    val inits: ListBuffer[List[String]]) {
 
@@ -60,6 +60,7 @@ object Smartbot {
 
     def trainFromLog(file: String) = {
       val messages = getMessages(file)
+      this.depth = messages.next().toInt
       messages.foreach { train(_) }
     }
 
