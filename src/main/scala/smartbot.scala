@@ -26,9 +26,19 @@ object SmartBot {
 
     override def onMessage(channel: String, sender: String, login: String,
                            hostname: String, message: String) {
-      sendMessage(channel, dict.generateSentence())
+      val reply = removePings(channel, dict.generateSentence())
+      sendMessage(channel, reply)
+
       dict.train(message)
       addToLog(logPath, message)
+    }
+
+    private def removePings(channel: String, message: String) : String = {
+      getUsers(channel).foldLeft(message)({ (replaced, user) =>
+        val nick = user.getNick()
+        val mangled = nick.head + "." + nick.tail
+        replaced.replaceAll(nick, mangled)
+      })
     }
   }
 
