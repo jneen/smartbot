@@ -43,6 +43,11 @@ object SmartBot {
       }
     }
 
+    override def onPrivateMessage(sender: String, login: String,
+                                  hostname: String, message: String) {
+      sendMessage(sender, dict.generateSentence())
+    }
+
     private def removePings(channel: String, message: String) : String = {
       getUsers(channel).foldLeft(message)({ (replaced, user) =>
         val nick = user.getNick()
