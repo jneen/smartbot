@@ -18,6 +18,7 @@ object SmartBot {
       } catch {
         case e: NickAlreadyInUseException => {
           name = name + "t"
+          println("connecting to the server as `"+name+"'")
           connect(server, channel, passwordOpt)
         }
       }
@@ -39,6 +40,7 @@ object SmartBot {
     val passwordOpt = sys.env.get("PASSWORD")
 
     val dict = MarkovDict.trainFromLog(logPath)
+    println("finished training the bot")
     val bot = new Bot(botName, dict, logPath)
 
     bot.connect(server, channel, passwordOpt)
