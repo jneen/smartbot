@@ -21,7 +21,7 @@ object MarkovDict {
 
 }
 
-class MarkovDict(var depth: Int,
+class MarkovDict(val depth: Int,
                  val links: mutable.Map[List[String], Histogram],
                  val inits: ListBuffer[List[String]]) {
 
