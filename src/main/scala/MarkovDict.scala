@@ -90,18 +90,14 @@ class Histogram {
     require(size > 0)
     val rand = randGen.nextInt(size)
     var count = 0
-    val chosenPair = words.find { pair =>
+
+    words.foreach { pair =>
       val word = pair._1
       val score = pair._2
-      if (count >= rand) {
-        true
-      }
-      else {
-        count += score
-        false
-      }
+      count += score
+      if (count > rand) return word
     }
 
-    chosenPair.get._1
+    throw new RuntimeException("sample failed to return a value")
   }
 }
