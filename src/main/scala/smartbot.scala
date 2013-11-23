@@ -28,7 +28,7 @@ object SmartBot {
     def shouldRespond(sender: String, message: String): Boolean = {
       val wantToRespondTo = List(name)
       val words = dict.tokenize(message)
-      wantToRespondTo.map(words.contains(_)).foldLeft(false) {_ || _}
+      wantToRespondTo.exists(words.contains(_))
     }
 
     override def onMessage(channel: String, sender: String, login: String,
