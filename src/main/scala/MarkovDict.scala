@@ -87,6 +87,7 @@ class Histogram {
 
   // weighted random
   def sample: String = {
+    require(size > 0)
     val rand = randGen.nextInt(size)
     var count = 0
     val chosenPair = words.find { pair =>
