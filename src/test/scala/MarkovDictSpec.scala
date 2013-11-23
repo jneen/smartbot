@@ -26,9 +26,8 @@ class MarkovDictSpec extends Specification {
     }
 
     "train from log messages" in {
-      val dict = MarkovDict.empty(3)
       val testFile = "examples/irc_log.log"
-      dict.trainFromLog(testFile)
+      val dict = MarkovDict.trainFromLog(testFile)
       dict.links.size must be_!=(0)
       dict.links must haveKey(List("what", "up", "bitches"))
     }

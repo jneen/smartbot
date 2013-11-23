@@ -7,9 +7,18 @@ import smartbot.LogParser._
 import scala.annotation.tailrec
 
 object MarkovDict {
+
   def empty(depth: Int) = {
     new MarkovDict(depth, mutable.Map[List[String], Histogram](), ListBuffer())
   }
+
+  def trainFromLog(file: String): MarkovDict = {
+    val (depth, messages) = getMessages(file)
+    val dict = empty(depth.getOrElse(3))
+    messages.foreach { dict.train(_) }
+    dict
+  }
+
 }
 
 class MarkovDict(var depth: Int,
@@ -25,12 +34,6 @@ class MarkovDict(var depth: Int,
     tokens.sliding(depth+1).foreach { seq =>
       linkFor(seq.take(depth)).addWord(seq.last)
     }
-  }
-
-  def trainFromLog(file: String) = {
-    val messages = getMessages(file)
-    this.depth = messages.next().toInt
-    messages.foreach { train(_) }
   }
 
   def tokenize(str: String): Array[String] = {
