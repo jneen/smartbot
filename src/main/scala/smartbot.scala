@@ -31,7 +31,12 @@ object SmartBot {
     override def onMessage(channel: String, sender: String, login: String,
                            hostname: String, message: String) {
       val reply = removePings(channel, dict.generateSentence())
-      if (rateLimit()) sendMessage(channel, reply)
+      if (rateLimit()) {
+        sendMessage(channel, reply)
+      }
+      else {
+        sendMessage(channel, "nope.gif")
+      }
 
       dict.train(message)
       addToLog(logPath, message)
