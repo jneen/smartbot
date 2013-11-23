@@ -1,2 +1,4 @@
 /project
 /target
+.DS_Store
+irc_logs/*
