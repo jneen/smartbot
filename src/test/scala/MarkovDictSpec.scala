@@ -41,5 +41,14 @@ class MarkovDictSpec extends Specification {
       dict.train("a sentence with words")
       dict.generateSentence("a sentence with") must be_==("a sentence with words")
     }
+
+    "randSeed" in {
+      val dict = MarkovDict.empty(3)
+      dict.train("one two three four")
+      val seed = dict.randSeed().toList
+      println(seed.toList)
+      seed must be_==(List("one", "two", "three"))
+      dict.generateSentence() must be_==("one two three four")
+    }
   }
 }

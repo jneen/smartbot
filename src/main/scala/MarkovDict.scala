@@ -23,7 +23,9 @@ object MarkovDict {
 
 class MarkovDict(val depth: Int,
                  val links: mutable.Map[List[String], Histogram],
-                 val inits: ListBuffer[List[String]]) {
+                 val inits: ListBuffer[Array[String]]) {
+
+  val randGen = new Random()
 
   def linkFor(pattern: Array[String]) : Histogram = {
     links.getOrElseUpdate(pattern toList, { new Histogram })
@@ -31,6 +33,9 @@ class MarkovDict(val depth: Int,
 
   def train(sentence: String) = {
     val tokens = tokenize(sentence)
+    val init = tokens.take(depth)
+    inits.append(init)
+
     if (tokens.length >= depth + 1) {
       tokens.sliding(depth+1).foreach { seq =>
         linkFor(seq.take(depth)).addWord(seq.last)
@@ -46,6 +51,10 @@ class MarkovDict(val depth: Int,
     tokens.mkString(" ")
   }
 
+  def randSeed() : Array[String] = {
+    inits(randGen.nextInt(inits.size))
+  }
+
   @tailrec
   private def generateFromTokens(tokens: Array[String]) : String = {
     if (tokens.size > 50) return detokenize(tokens)
@@ -58,6 +67,10 @@ class MarkovDict(val depth: Int,
 
   def generateSentence(seed: String) : String = {
     generateFromTokens(tokenize(seed))
+  }
+
+  def generateSentence() : String = {
+    generateFromTokens(randSeed())
   }
 }
 
