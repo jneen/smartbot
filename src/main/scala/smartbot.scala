@@ -7,6 +7,10 @@ import LogParser._
 object SmartBot {
 
   class Bot(var name: String, dict: MarkovDict, logPath: String) extends PircBot {
+    var lastInterval: Long = 0
+    var rateLimitCount = 0
+    val rateLimitMax = 10
+    val rateLimitInterval = 10 * 60 // 10 minutes
 
     def connect(server: String, channel: String, passwordOpt: Option[String]) {
       try {
@@ -27,7 +31,7 @@ object SmartBot {
     override def onMessage(channel: String, sender: String, login: String,
                            hostname: String, message: String) {
       val reply = removePings(channel, dict.generateSentence())
-      sendMessage(channel, reply)
+      if (rateLimit()) sendMessage(channel, reply)
 
       dict.train(message)
       addToLog(logPath, message)
@@ -39,6 +43,21 @@ object SmartBot {
         val mangled = nick.head + "." + nick.tail
         replaced.replaceAll(nick, mangled)
       })
+    }
+
+    private def rateLimit(): Boolean = {
+      val now = System.currentTimeMillis / 1000
+      val currentInterval = now / rateLimitInterval
+
+      if (currentInterval == lastInterval) {
+        rateLimitCount += 1
+      }
+      else {
+        lastInterval = currentInterval
+        rateLimitCount = 0
+      }
+
+      rateLimitCount < rateLimitMax
     }
   }
 
