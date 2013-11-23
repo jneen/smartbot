@@ -13,7 +13,7 @@ object SmartBot {
         setEncoding("UTF-8")
         setVerbose(true)
         connect(server)
-        joinChannel(channel) 
+        joinChannel(channel)
       } catch {
         case e: NickAlreadyInUseException => {
           name = name + "t"
