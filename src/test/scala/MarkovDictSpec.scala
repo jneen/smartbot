@@ -28,8 +28,12 @@ class MarkovDictSpec extends Specification {
     "train from log messages" in {
       val testFile = "examples/irc_log.log"
       val dict = MarkovDict.trainFromLog(testFile)
+      dict.depth must be_==(3)
       dict.links.size must be_!=(0)
-      dict.links must haveKey(List("what", "up", "bitches"))
+      dict.links must haveKey(List("oh", "sorry", "i"))
+
+      dict.generateSentence("oh sorry i") must be_==("oh sorry i use vim now")
+      dict.generateSentence("what up bitches") must be_==("what up bitches")
     }
 
     "generateSentence" in {

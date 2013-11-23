@@ -31,8 +31,10 @@ class MarkovDict(var depth: Int,
 
   def train(sentence: String) = {
     val tokens = tokenize(sentence)
-    tokens.sliding(depth+1).foreach { seq =>
-      linkFor(seq.take(depth)).addWord(seq.last)
+    if (tokens.length >= depth + 1) {
+      tokens.sliding(depth+1).foreach { seq =>
+        linkFor(seq.take(depth)).addWord(seq.last)
+      }
     }
   }
 
