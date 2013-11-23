@@ -1,11 +1,12 @@
 package smartbot
 
 import org.jibble.pircbot._
+import LogParser._
 
 
 object SmartBot {
 
-  class Bot(var name: String, dict: MarkovDict, dbPath: String) extends PircBot {
+  class Bot(var name: String, dict: MarkovDict, logPath: String) extends PircBot {
 
     def connect(server: String, channel: String, passwordOpt: Option[String]) {
       try {
@@ -17,6 +18,7 @@ object SmartBot {
       } catch {
         case e: NickAlreadyInUseException => {
           name = name + "t"
+          println("connecting to the server as `"+name+"'")
           connect(server, channel, passwordOpt)
         }
       }
@@ -27,6 +29,9 @@ object SmartBot {
 
       val reply = removePings(channel, dict.generateSentence())
       sendMessage(channel, reply)
+
+      dict.train(message)
+      addToLog(logPath, message)
     }
 
     private def removePings(channel: String, message: String) : String = {
@@ -42,11 +47,12 @@ object SmartBot {
     val botName = sys.env.get("BOT_NAME").getOrElse("stufflebot")
     val channel = sys.env.get("CHANNEL").getOrElse("#csuatest")
     val server = sys.env.get("SERVER").getOrElse("irc.freenode.net")
-    val dbPath = sys.env.get("DB_PATH").getOrElse("./irc_logs/csua.log")
+    val logPath = sys.env.get("LOG_PATH").getOrElse("./irc_logs/csua.log")
     val passwordOpt = sys.env.get("PASSWORD")
 
-    val dict = MarkovDict.trainFromLog(dbPath)
-    val bot = new Bot(botName, dict, dbPath)
+    val dict = MarkovDict.trainFromLog(logPath)
+    println("finished training the bot")
+    val bot = new Bot(botName, dict, logPath)
 
     bot.connect(server, channel, passwordOpt)
   }

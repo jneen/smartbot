@@ -1,6 +1,7 @@
 package smartbot
 
 import scala.io.Source
+import java.io.FileWriter
 
 
 object LogParser {
@@ -21,4 +22,10 @@ object LogParser {
     (getDepth(firstLine), messages)
   }
 
+  def addToLog(file: String, message: String) = {
+    val log = new FileWriter(file, true)
+    log.write(message + "\n")
+    log.close()
+    println("Added " + message + " to " + file)
+  }
 }
