@@ -4,16 +4,14 @@ import org.jibble.pircbot._
 
 
 object SmartBot {
+
   class Bot(var name: String, dict: MarkovDict, dbPath: String) extends PircBot {
-    def setup(name: String) {
-      setEncoding("UTF-8")
-      setVerbose(true)
-    }
 
     def connect(server: String, channel: String, passwordOpt: Option[String]) {
       try {
         setName(name)
         setEncoding("UTF-8")
+        setVerbose(true)
         connect(server)
         joinChannel(channel) 
       } catch {
@@ -32,10 +30,10 @@ object SmartBot {
   }
 
   def main(args: Array[String]) {
-    val botName = sys.env.get("BOT_NAME").getOrElse("yabishbot")
+    val botName = sys.env.get("BOT_NAME").getOrElse("stufflebot")
     val channel = sys.env.get("CHANNEL").getOrElse("#csuatest")
     val server = sys.env.get("SERVER").getOrElse("irc.freenode.net")
-    val dbPath = sys.env.get("DB_PATH").getOrElse("./db/ya_bish")
+    val dbPath = sys.env.get("DB_PATH").getOrElse("./irc_logs/csua.log")
     val passwordOpt = sys.env.get("PASSWORD")
 
     val dict = MarkovDict.trainFromLog(dbPath)
