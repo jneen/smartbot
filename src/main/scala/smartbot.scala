@@ -2,11 +2,12 @@ package smartbot
 
 import org.jibble.pircbot._
 import LogParser._
+import scala.util.Random
 
 
 object SmartBot {
 
-  class Bot(var name: String, dict: MarkovDict, logPath: String) extends PircBot {
+  class Bot(var name: String, dict: MarkovDict, logPath: String, responseFrequency: Int) extends PircBot {
 
     def connect(server: String, channel: String, passwordOpt: Option[String]) {
       try {
@@ -24,13 +25,22 @@ object SmartBot {
       }
     }
 
+    def shouldRespond(sender: String, message: String): Boolean = {
+      val wantToRespondTo = List(name)
+      val words = dict.tokenize(message)
+      wantToRespondTo.map(words.contains(_)).foldLeft(false) {_ || _}
+    }
+
     override def onMessage(channel: String, sender: String, login: String,
                            hostname: String, message: String) {
-      val reply = removePings(channel, dict.generateSentence())
-      sendMessage(channel, reply)
-
-      dict.train(message)
-      addToLog(logPath, message)
+      if (shouldRespond(sender, message) || Random.nextInt(responseFrequency) == 0) {
+        val reply = removePings(channel, dict.generateSentence())
+        sendMessage(channel, reply)
+      }
+      if (!sender.contains("bot")) {
+        dict.train(message)
+        addToLog(logPath, message)
+      }
     }
 
     private def removePings(channel: String, message: String) : String = {
@@ -47,12 +57,13 @@ object SmartBot {
     val channel = sys.env.get("CHANNEL").getOrElse("#csuatest")
     val server = sys.env.get("SERVER").getOrElse("irc.freenode.net")
     val logPath = sys.env.get("LOG_PATH").getOrElse("./irc_logs/csua.log")
+    val responseRatio = sys.env.get("RESPONSE_RATIO").getOrElse("80").toInt
     val passwordOpt = sys.env.get("PASSWORD")
 
     val dict = MarkovDict.trainFromLog(logPath)
     println("finished training the bot")
-    val bot = new Bot(botName, dict, logPath)
 
+    val bot = new Bot(botName, dict, logPath, responseRatio)
     bot.connect(server, channel, passwordOpt)
   }
 }
