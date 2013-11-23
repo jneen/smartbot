@@ -25,7 +25,7 @@ object SmartBot {
     override def onMessage(channel: String, sender: String, login: String,
                            hostname: String, message: String) {
 
-      sendMessage(channel, dict.generateSentence(message))
+      sendMessage(channel, dict.generateSentence())
     }
   }
 
