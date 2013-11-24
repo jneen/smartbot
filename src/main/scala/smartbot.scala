@@ -7,7 +7,14 @@ import scala.util.Random
 
 object SmartBot {
 
-  class Bot(var name: String, dict: MarkovDict, logPath: String, responseFrequency: Int) extends PircBot {
+  class Bot(var name: String,
+            dict: MarkovDict,
+            logPath: String,
+            responseFrequency: Int,
+            rateLimitMax: Int = 10,
+            rateLimitInterval: Int = 600) extends PircBot {
+    var lastInterval: Long = 0
+    var rateLimitCount = 0
 
     def connect(server: String, channel: String, passwordOpt: Option[String]) {
       try {
@@ -35,7 +42,13 @@ object SmartBot {
                            hostname: String, message: String) {
       if (shouldRespond(sender, message) || Random.nextInt(responseFrequency) == 0) {
         val reply = removePings(channel, dict.generateSentence())
-        sendMessage(channel, reply)
+
+        if (rateLimit()) {
+          sendMessage(channel, reply)
+        }
+        else {
+          sendMessage(channel, "nope.gif")
+        }
       }
       if (!sender.contains("bot")) {
         dict.train(message)
@@ -55,6 +68,21 @@ object SmartBot {
         replaced.replaceAll(nick, mangled)
       })
     }
+
+    private def rateLimit(): Boolean = {
+      val now = System.currentTimeMillis / 1000
+      val currentInterval = now / rateLimitInterval
+
+      if (currentInterval == lastInterval) {
+        rateLimitCount += 1
+      }
+      else {
+        lastInterval = currentInterval
+        rateLimitCount = 0
+      }
+
+      rateLimitCount < rateLimitMax
+    }
   }
 
   def main(args: Array[String]) {
@@ -63,12 +91,20 @@ object SmartBot {
     val server = sys.env.get("SERVER").getOrElse("irc.freenode.net")
     val logPath = sys.env.get("LOG_PATH").getOrElse("./irc_logs/csua.log")
     val responseRatio = sys.env.get("RESPONSE_RATIO").getOrElse("80").toInt
+    val rateLimit = sys.env.get("RATE_LIMIT").getOrElse("10").toInt
     val passwordOpt = sys.env.get("PASSWORD")
 
     val dict = MarkovDict.trainFromLog(logPath)
     println("finished training the bot")
 
-    val bot = new Bot(botName, dict, logPath, responseRatio)
+    val bot = new Bot(
+      name = botName,
+      dict = dict,
+      logPath = logPath,
+      responseFrequency = responseRatio,
+      rateLimitMax = rateLimit
+    )
+
     bot.connect(server, channel, passwordOpt)
   }
 }
