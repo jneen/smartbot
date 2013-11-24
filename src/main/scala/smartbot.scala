@@ -7,11 +7,14 @@ import scala.util.Random
 
 object SmartBot {
 
-  class Bot(var name: String, dict: MarkovDict, logPath: String, responseFrequency: Int) extends PircBot {
+  class Bot(var name: String,
+            dict: MarkovDict,
+            logPath: String,
+            responseFrequency: Int,
+            rateLimitMax: Int = 10,
+            rateLimitInterval: Int = 600) extends PircBot {
     var lastInterval: Long = 0
     var rateLimitCount = 0
-    val rateLimitMax = 10
-    val rateLimitInterval = 10 * 60 // 10 minutes
 
     def connect(server: String, channel: String, passwordOpt: Option[String]) {
       try {
