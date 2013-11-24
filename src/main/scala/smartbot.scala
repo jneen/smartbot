@@ -91,12 +91,20 @@ object SmartBot {
     val server = sys.env.get("SERVER").getOrElse("irc.freenode.net")
     val logPath = sys.env.get("LOG_PATH").getOrElse("./irc_logs/csua.log")
     val responseRatio = sys.env.get("RESPONSE_RATIO").getOrElse("80").toInt
+    val rateLimit = sys.env.get("RATE_LIMIT").getOrElse("10").toInt
     val passwordOpt = sys.env.get("PASSWORD")
 
     val dict = MarkovDict.trainFromLog(logPath)
     println("finished training the bot")
 
-    val bot = new Bot(botName, dict, logPath, responseRatio)
+    val bot = new Bot(
+      name = botName,
+      dict = dict,
+      logPath = logPath,
+      responseFrequency = responseRatio,
+      rateLimitMax = rateLimit
+    )
+
     bot.connect(server, channel, passwordOpt)
   }
 }
