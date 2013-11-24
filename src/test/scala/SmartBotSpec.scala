@@ -7,7 +7,13 @@ class SmartBotSpec extends Specification {
 
   "shouldReturn" should {
 
-    val bot = new SmartBot.Bot("botName", MarkovDict.empty(3), "examples/irc_log.log", 1000)
+    val bot = new SmartBot.Bot(
+      name = "botName",
+      dict = MarkovDict.empty(3),
+      logPath = "examples/irc_log.log",
+      responseFrequency = 1000,
+      rateLimitMax = 10
+    )
 
     "return true if their name was in the message" in {
       bot.shouldRespond("sender", "hi botName") must be_==(true)
