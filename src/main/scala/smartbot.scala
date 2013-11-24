@@ -15,6 +15,7 @@ object SmartBot {
             rateLimitInterval: Int = 600) extends PircBot {
     var lastInterval: Long = 0
     var rateLimitCount = 0
+    var hasReplied = false
 
     def connect(server: String, channel: String, passwordOpt: Option[String]) {
       try {
@@ -45,8 +46,9 @@ object SmartBot {
         if (rateLimit()) {
           sendMessage(channel, reply)
         }
-        else {
-          sendMessage(channel, "nope.gif")
+        else if (!hasRepplied) {
+          sendMessage(channel, "nope.gif (I'm rate limiting my replies, so I don't spam this channel)")
+          hasReplied = true
         }
       }
       if (!sender.contains("bot")) {
@@ -77,6 +79,7 @@ object SmartBot {
       }
       else {
         lastInterval = currentInterval
+        hasReplied = false
         rateLimitCount = 0
       }
 
