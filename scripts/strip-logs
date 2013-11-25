@@ -1,0 +1,15 @@
+#!/bin/sed -rnf
+
+# usage: ./script/strip.sed $logfile > $outfile
+
+# select lines with <nick>s
+/<[^<>]+>/ {
+  # remove the nick and everything before it (and whitespace for good measure)
+  s/^[^>]*>\s*//
+
+  # remove non-printable characters (^Z shows up a lot in the lisp logs)
+  s/[^[:print:]]//g
+
+  # print the line
+  p
+}
