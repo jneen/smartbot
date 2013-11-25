@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 object MarkovDict {
 
   def empty(depth: Int) = {
-    new MarkovDict(depth, mutable.Map[List[String], Histogram](), ListBuffer())
+    new MarkovDict(depth, mutable.HashMap[List[String], Histogram](), ListBuffer())
   }
 
   def trainFromLog(file: String): MarkovDict = {
@@ -22,7 +22,7 @@ object MarkovDict {
 }
 
 class MarkovDict(val depth: Int,
-                 val links: mutable.Map[List[String], Histogram],
+                 val links: mutable.HashMap[List[String], Histogram],
                  val inits: ListBuffer[Array[String]]) {
 
   val randGen = new Random()
@@ -33,12 +33,19 @@ class MarkovDict(val depth: Int,
 
   def train(sentence: String) = {
     val tokens = tokenize(sentence)
+    val len = tokens.length
 
-    if (tokens.length >= depth + 1) {
+    if (len >= depth + 1) {
       inits.append(tokens.take(depth))
 
-      tokens.sliding(depth+1).foreach { seq =>
-        linkFor(seq.take(depth)).addWord(seq.last)
+      val patterns = tokens.sliding(depth)
+
+      for ((pat, i) <- patterns.zipWithIndex) {
+        // exclude the last n-gram, which has nothing to map to
+        if (depth + i < len) {
+          val targetWord = tokens(depth+i)
+          linkFor(pat).addWord(targetWord)
+        }
       }
     }
   }
