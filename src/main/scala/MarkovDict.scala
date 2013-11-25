@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 object MarkovDict {
 
   def empty(depth: Int) = {
-    new MarkovDict(depth, mutable.Map[List[String], Histogram](), ListBuffer())
+    new MarkovDict(depth, mutable.HashMap[List[String], Histogram](), ListBuffer())
   }
 
   def trainFromLog(file: String): MarkovDict = {
@@ -22,7 +22,7 @@ object MarkovDict {
 }
 
 class MarkovDict(val depth: Int,
-                 val links: mutable.Map[List[String], Histogram],
+                 val links: mutable.HashMap[List[String], Histogram],
                  val inits: ListBuffer[Array[String]]) {
 
   val randGen = new Random()
