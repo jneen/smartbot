@@ -88,7 +88,7 @@ object SmartBot {
   }
 
   def main(args: Array[String]) {
-    val botName = sys.env.get("BOT_NAME").getOrElse("stufflebot")
+    val botName = sys.env.get("BOT_NAME").getOrElse("artemisphd")
     val channel = sys.env.get("CHANNEL").getOrElse("#csuatest")
     val server = sys.env.get("SERVER").getOrElse("irc.freenode.net")
     val logPath = sys.env.get("LOG_PATH").getOrElse("./irc_logs/csua.log")
