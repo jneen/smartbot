@@ -51,7 +51,7 @@ object SmartBot {
           hasReplied = true
         }
       }
-      if (!sender.contains("bot")) {
+      else if (!sender.contains("bot")) {
         dict.train(message)
         addToLog(logPath, message)
       }
