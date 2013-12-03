@@ -33,7 +33,7 @@ class MarkovDictSpec extends Specification {
       dict.links must haveKey(List("oh", "sorry", "i"))
 
       dict.generateSentence("oh sorry i") must be_==("oh sorry i use vim now")
-      dict.generateSentence("what up bitches") must be_==("what up bitches")
+      dict.generateSentence("because that's") must be_==("because that's a pretty cool way to say it")
     }
 
     "generateSentence" in {

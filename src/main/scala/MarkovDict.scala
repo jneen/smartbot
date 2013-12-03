@@ -81,7 +81,6 @@ class MarkovDict(val depth: Int,
   }
 
   private def expandSeed(seed: Array[String]) : Array[String] = {
-    if (seed.size >= depth) return seed
     if (seed.size == 0) return randSeed()
 
     val validInits = inits.filter { _.startsWith(seed) }
@@ -94,8 +93,21 @@ class MarkovDict(val depth: Int,
     validInits(randIdx)
   }
 
+  private def improveSeed(seed: Array[String]) : Array[String] = {
+    if (seed.size < depth) return expandSeed(seed)
+
+    val tail = seed.takeRight(depth).toList
+
+    if (links.contains(tail)) {
+      seed
+    }
+    else {
+      improveSeed(seed.dropRight(1))
+    }
+  }
+
   def generateSentence(seed: String) : String = {
-    generateFromTokens(expandSeed(tokenize(seed)))
+    generateFromTokens(improveSeed(tokenize(seed)))
   }
 
   def generateSentence() : String = {
