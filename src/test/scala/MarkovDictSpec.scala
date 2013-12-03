@@ -51,12 +51,14 @@ class MarkovDictSpec extends Specification {
       dict.generateSentence() must be_==("one two three four")
     }
 
-    "expandSeed" in {
+    "improveSeed" in {
       val dict = MarkovDict.empty(3)
       dict.train("one two three four")
       dict.generateSentence("one two") must be_==("one two three four")
       dict.generateSentence("one three") must be_==("one two three four")
       dict.generateSentence("three") must be_==("one two three four")
+      dict.generateSentence("prefix one two three five banana") must be_==("prefix one two three four")
+      dict.generateSentence("one two five banana") must be_==("one two three four")
     }
   }
 }
