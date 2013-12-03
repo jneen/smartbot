@@ -15,7 +15,15 @@ object MarkovDict {
   def trainFromLog(file: String): MarkovDict = {
     val (depth, messages) = getMessages(file)
     val dict = empty(depth.getOrElse(3))
-    messages.foreach { dict.train(_) }
+
+    var processed = 0
+    messages.foreach { line =>
+      processed += 1
+      if (processed % 5000 == 0) println(processed)
+
+      dict.train(line)
+    }
+
     dict
   }
 
