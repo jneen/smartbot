@@ -38,10 +38,26 @@ object SmartBot {
       wantToRespondTo.exists(message.contains(_))
     }
 
+    def getSeed(message: String) : Option[String] = {
+      val idx = message.lastIndexOfSlice(name)
+
+      if (idx > 0) {
+        Some(message.take(idx).trim())
+      }
+      else {
+        None
+      }
+    }
+
     override def onMessage(channel: String, sender: String, login: String,
                            hostname: String, message: String) {
       if (shouldRespond(sender, message) || Random.nextInt(responseFrequency) == 0) {
-        val reply = removePings(channel, dict.generateSentence())
+        val sentence = getSeed(message) match {
+          case Some(seed) => dict.generateSentence(seed)
+          case _ => dict.generateSentence()
+        }
+
+        val reply = removePings(channel, sentence)
 
         if (rateLimit()) {
           sendMessage(channel, reply)
