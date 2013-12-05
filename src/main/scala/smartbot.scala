@@ -57,10 +57,8 @@ object SmartBot {
           case _ => dict.generateSentence()
         }
 
-        val reply = removePings(channel, sentence)
-
         if (rateLimit()) {
-          sendMessage(channel, reply)
+          sendSanitized(channel, sentence)
         }
         else if (!hasReplied) {
           sendMessage(channel, "nope.gif (I'm rate limiting my replies, so I don't spam this channel)")
@@ -76,6 +74,23 @@ object SmartBot {
     override def onPrivateMessage(sender: String, login: String,
                                   hostname: String, message: String) {
       sendMessage(sender, dict.generateSentence())
+    }
+
+    private def sanitizeMessage(channel: String, message: String) {
+      removeBang(removePings(channel, message))
+    }
+
+    private def sendSanitized(channel: String, message: String) {
+      sendMessage(channel, removeBang(removePings(channel, message)))
+    }
+
+    private def removeBang(message: String) : String = {
+      if (message.startsWith("!")) {
+        "."+message
+      }
+      else {
+        message
+      }
     }
 
     private def removePings(channel: String, message: String) : String = {
