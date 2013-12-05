@@ -16,10 +16,10 @@ class MarkovDictSpec extends Specification {
       val dict = MarkovDict.empty(3)
       dict.train("a sentence with words and stuff")
       dict.links.size must be_==(3)
-      dict.links must haveKey(List("a", "sentence", "with"))
-      dict.links must haveKey(List("sentence", "with", "words"))
-      dict.links must haveKey(List("with", "words", "and"))
-      val hist = dict.links.get(List("sentence", "with", "words")).get
+      dict.links must haveKey("a sentence with")
+      dict.links must haveKey("sentence with words")
+      dict.links must haveKey("with words and")
+      val hist = dict.links.get("sentence with words").get
 
       hist.size must be_==(1)
       hist.sample must be_==("and")
@@ -30,7 +30,7 @@ class MarkovDictSpec extends Specification {
       val dict = MarkovDict.trainFromLog(testFile)
       dict.depth must be_==(3)
       dict.links.size must be_!=(0)
-      dict.links must haveKey(List("oh", "sorry", "i"))
+      dict.links must haveKey("oh sorry i")
 
       dict.generateSentence("oh sorry i") must be_==("oh sorry i use vim now")
       dict.generateSentence("because that's") must be_==("because that's a pretty cool way to say it")
@@ -39,7 +39,7 @@ class MarkovDictSpec extends Specification {
     "generateSentence" in {
       val dict = MarkovDict.empty(3)
       dict.train("a sentence with words")
-      dict.generateSentence("a sentence with") must be_==("a sentence with words")
+      dict.generateSentence("a SENTENCE with") must be_==("a SENTENCE with words")
     }
 
     "randSeed" in {
