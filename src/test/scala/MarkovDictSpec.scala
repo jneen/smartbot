@@ -33,7 +33,7 @@ class MarkovDictSpec extends Specification {
       dict.links must haveKey(List("oh", "sorry", "i"))
 
       dict.generateSentence("oh sorry i") must be_==("oh sorry i use vim now")
-      dict.generateSentence("what up bitches") must be_==("what up bitches")
+      dict.generateSentence("because that's") must be_==("because that's a pretty cool way to say it")
     }
 
     "generateSentence" in {
@@ -49,6 +49,16 @@ class MarkovDictSpec extends Specification {
       println(seed.toList)
       seed must be_==(List("one", "two", "three"))
       dict.generateSentence() must be_==("one two three four")
+    }
+
+    "improveSeed" in {
+      val dict = MarkovDict.empty(3)
+      dict.train("one two three four")
+      dict.generateSentence("one two") must be_==("one two three four")
+      dict.generateSentence("one three") must be_==("one two three four")
+      dict.generateSentence("three") must be_==("one two three four")
+      dict.generateSentence("prefix one two three five banana") must be_==("prefix one two three four")
+      dict.generateSentence("one two five banana") must be_==("one two three four")
     }
   }
 }

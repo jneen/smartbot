@@ -38,13 +38,27 @@ object SmartBot {
       wantToRespondTo.exists(message.contains(_))
     }
 
+    def getSeed(message: String) : Option[String] = {
+      val idx = message.lastIndexOfSlice(name)
+
+      if (idx > 0) {
+        Some(message.take(idx).trim())
+      }
+      else {
+        None
+      }
+    }
+
     override def onMessage(channel: String, sender: String, login: String,
                            hostname: String, message: String) {
       if (shouldRespond(sender, message) || Random.nextInt(responseFrequency) == 0) {
-        val reply = removePings(channel, dict.generateSentence())
+        val sentence = getSeed(message) match {
+          case Some(seed) => dict.generateSentence(seed)
+          case _ => dict.generateSentence()
+        }
 
         if (rateLimit()) {
-          sendMessage(channel, reply)
+          sendSanitized(channel, sentence)
         }
         else if (!hasReplied) {
           sendMessage(channel, "nope.gif (I'm rate limiting my replies, so I don't spam this channel)")
@@ -60,6 +74,23 @@ object SmartBot {
     override def onPrivateMessage(sender: String, login: String,
                                   hostname: String, message: String) {
       sendMessage(sender, dict.generateSentence())
+    }
+
+    private def sanitizeMessage(channel: String, message: String) {
+      removeBang(removePings(channel, message))
+    }
+
+    private def sendSanitized(channel: String, message: String) {
+      sendMessage(channel, removeBang(removePings(channel, message)))
+    }
+
+    private def removeBang(message: String) : String = {
+      if (message.startsWith("!")) {
+        "."+message
+      }
+      else {
+        message
+      }
     }
 
     private def removePings(channel: String, message: String) : String = {
