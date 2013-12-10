@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 object MarkovDict {
 
   def empty(depth: Int) = {
-    new MarkovDict(depth, mutable.HashMap[List[String], Histogram](), ListBuffer())
+    new MarkovDict(depth, mutable.HashMap[String, Histogram](), ListBuffer())
   }
 
   def trainFromLog(file: String): MarkovDict = {
@@ -30,13 +30,17 @@ object MarkovDict {
 }
 
 class MarkovDict(val depth: Int,
-                 val links: mutable.HashMap[List[String], Histogram],
+                 val links: mutable.HashMap[String, Histogram],
                  val inits: ListBuffer[Array[String]]) {
 
   val randGen = new Random()
 
   def linkFor(pattern: Array[String]) : Histogram = {
-    links.getOrElseUpdate(pattern toList, { new Histogram })
+    links.getOrElseUpdate(toKey(pattern), { new Histogram })
+  }
+
+  private def toKey(pattern: Array[String]) : String = {
+    pattern.mkString(" ").toLowerCase()
   }
 
   def train(sentence: String) = {
@@ -74,7 +78,7 @@ class MarkovDict(val depth: Int,
   private def generateFromTokens(tokens: Array[String]) : String = {
     if (tokens.size > 50) return detokenize(tokens)
 
-    links.get(tokens.takeRight(depth) toList) match {
+    links.get(toKey(tokens.takeRight(depth))) match {
       case Some(hist) => generateFromTokens(tokens :+ hist.sample)
       case _ => detokenize(tokens)
     }
@@ -96,7 +100,7 @@ class MarkovDict(val depth: Int,
   private def improveSeed(seed: Array[String]) : Array[String] = {
     if (seed.size < depth) return expandSeed(seed)
 
-    val tail = seed.takeRight(depth).toList
+    val tail = toKey(seed.takeRight(depth))
 
     if (links.contains(tail)) {
       seed
