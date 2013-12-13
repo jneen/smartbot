@@ -97,7 +97,7 @@ object SmartBot {
       getUsers(channel).foldLeft(message)({ (replaced, user) =>
         val nick = user.getNick()
         val mangled = nick.head + "." + nick.tail
-        replaced.replaceAll(nick, mangled)
+        replaced.replaceAllLiterally(nick, mangled)
       })
     }
 
