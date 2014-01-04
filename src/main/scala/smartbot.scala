@@ -11,6 +11,7 @@ object SmartBot {
             dict: MarkovDict,
             logPath: String,
             responseFrequency: Int,
+            writeToLog: Boolean = false,
             rateLimitMax: Int = 10,
             rateLimitInterval: Int = 600) extends PircBot {
     var lastInterval: Long = 0
@@ -65,7 +66,7 @@ object SmartBot {
           hasReplied = true
         }
       }
-      else if (!sender.contains("bot")) {
+      else if (writeToLog && !sender.contains("bot")) {
         dict.train(message)
         addToLog(logPath, message)
       }
@@ -125,6 +126,7 @@ object SmartBot {
     val logPath = sys.env.get("LOG_PATH").getOrElse("./irc_logs/csua.log")
     val responseRatio = sys.env.get("RESPONSE_RATIO").getOrElse("80").toInt
     val rateLimit = sys.env.get("RATE_LIMIT").getOrElse("10").toInt
+    val writeToLog = sys.env.get("READ_ONLY").getOrElse("0")
     val passwordOpt = sys.env.get("PASSWORD")
 
     val dict = MarkovDict.trainFromLog(logPath)
@@ -135,6 +137,7 @@ object SmartBot {
       dict = dict,
       logPath = logPath,
       responseFrequency = responseRatio,
+      writeToLog = (writeToLog != "0"),
       rateLimitMax = rateLimit
     )
 
