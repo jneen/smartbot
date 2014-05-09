@@ -62,7 +62,7 @@ object SmartBot {
           sendSanitized(channel, sentence)
         }
         else if (!hasReplied) {
-          sendMessage(channel, "nope.gif (I'm rate limiting my replies, so I don't spam this channel)")
+          sendMessage(channel, "leave me alone :<")
           hasReplied = true
         }
       }
