@@ -46,7 +46,7 @@ object SmartBot {
     }
 
     def getPing(message: String) = {
-      if (message.startsWith(name)) {
+      if (message.startsWith(name + ":")) {
         Some(message.drop(name.length + 1).trim())
       }
       else {
