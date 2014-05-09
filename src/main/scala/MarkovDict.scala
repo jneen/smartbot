@@ -27,6 +27,13 @@ object MarkovDict {
     dict
   }
 
+  def tokenize(str: String): Array[String] = {
+    str.split(" ")
+  }
+
+  def detokenize(tokens: Array[String]): String = {
+    tokens.mkString(" ")
+  }
 }
 
 class MarkovDict(val depth: Int,
@@ -44,7 +51,7 @@ class MarkovDict(val depth: Int,
   }
 
   def train(sentence: String) = {
-    val tokens = tokenize(sentence)
+    val tokens = MarkovDict.tokenize(sentence)
     val len = tokens.length
 
     if (len >= depth + 1) {
@@ -62,25 +69,17 @@ class MarkovDict(val depth: Int,
     }
   }
 
-  def tokenize(str: String): Array[String] = {
-    str.split(" ")
-  }
-
-  def detokenize(tokens: Array[String]): String = {
-    tokens.mkString(" ")
-  }
-
   def randSeed() : Array[String] = {
     inits(randGen.nextInt(inits.size))
   }
 
   @tailrec
   private def generateFromTokens(tokens: Array[String]) : String = {
-    if (tokens.size > 50) return detokenize(tokens)
+    if (tokens.size > 50) return MarkovDict.detokenize(tokens)
 
     links.get(toKey(tokens.takeRight(depth))) match {
       case Some(hist) => generateFromTokens(tokens :+ hist.sample)
-      case _ => detokenize(tokens)
+      case _ => MarkovDict.detokenize(tokens)
     }
   }
 
@@ -111,7 +110,7 @@ class MarkovDict(val depth: Int,
   }
 
   def generateSentence(seed: String) : String = {
-    generateFromTokens(improveSeed(tokenize(seed)))
+    generateFromTokens(improveSeed(MarkovDict.tokenize(seed)))
   }
 
   def generateSentence() : String = {
