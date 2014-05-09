@@ -74,7 +74,7 @@ class MarkovDict(val depth: Int,
   }
 
   @tailrec
-  private def generateFromTokens(tokens: Array[String]) : String = {
+  final def generateFromTokens(tokens: Array[String]) : String = {
     if (tokens.size > 50) return MarkovDict.detokenize(tokens)
 
     links.get(toKey(tokens.takeRight(depth))) match {
@@ -110,6 +110,7 @@ class MarkovDict(val depth: Int,
   }
 
   def generateSentence(seed: String) : String = {
+    if (seed.trim() == "") return generateFromTokens(randSeed())
     generateFromTokens(improveSeed(MarkovDict.tokenize(seed)))
   }
 

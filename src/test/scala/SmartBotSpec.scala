@@ -5,22 +5,27 @@ import smartbot._
 
 class SmartBotSpec extends Specification {
 
-  "shouldReturn" should {
+  "getSeed" should {
 
     val bot = new SmartBot.Bot(
       name = "botName",
       dict = MarkovDict.empty(3),
       logPath = "examples/irc_log.log",
+      catchphrases = Array(Array("foo", "bar")),
       responseFrequency = 1000,
       rateLimitMax = 10
     )
 
-    "return true if their name was in the message" in {
-      bot.shouldRespond("sender", "hi botName") must be_==(true)
+    "seed with a catchphrase" in {
+      bot.getSeed("foo bar baz") must be_==(Some("foo bar"))
     }
 
-    "return false for an arbitary message" in {
-      bot.shouldRespond("sender", "blah blah") must be_==(false)
+    "seed with a ping" in {
+      bot.getSeed("botName: foo bar baz") must be_==(Some("foo bar baz"))
+    }
+
+    "return None for an arbitary message" in {
+      bot.getSeed("blah blah") must be_==(None)
     }
   }
 

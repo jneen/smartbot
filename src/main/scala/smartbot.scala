@@ -12,6 +12,7 @@ object SmartBot {
             logPath: String,
             responseFrequency: Int,
             writeToLog: Boolean = false,
+            catchphrases: Array[Array[String]] = Array(),
             rateLimitMax: Int = 10,
             rateLimitInterval: Int = 600) extends PircBot {
     var lastInterval: Long = 0
@@ -35,40 +36,49 @@ object SmartBot {
     }
 
     def shouldRespond(sender: String, message: String): Boolean = {
-      val wantToRespondTo = List(name)
-      wantToRespondTo.exists(message.contains(_))
+      true
     }
 
-    def getSeed(message: String) : Option[String] = {
-      val idx = message.lastIndexOfSlice(name)
+    def getCatchphrase(message: String) : Option[String] = {
+      val tokens = MarkovDict.tokenize(message)
 
-      if (idx > 0) {
-        Some(message.take(idx).trim())
+      catchphrases.find { tokens.startsWith(_) }.map { MarkovDict.detokenize(_) }
+    }
+
+    def getPing(message: String) = {
+      if (message.startsWith(name)) {
+        Some(message.drop(name.length + 1).trim())
       }
       else {
         None
       }
     }
 
+    def getSeed(message: String) : Option[String] = {
+      getCatchphrase(message) orElse getPing(message)
+    }
+
     override def onMessage(channel: String, sender: String, login: String,
                            hostname: String, message: String) {
-      if (shouldRespond(sender, message) || Random.nextInt(responseFrequency) == 0) {
-        val sentence = getSeed(message) match {
-          case Some(seed) => dict.generateSentence(seed)
-          case _ => dict.generateSentence()
+      getSeed(message) match {
+        case Some(seed) => {
+          println("using seed:")
+          println("<"+seed+">")
+          val sentence = dict.generateSentence(seed)
+          if (rateLimit()) {
+            sendSanitized(channel, sentence)
+          }
+          else if (!hasReplied) {
+            sendMessage(channel, "leave me alone :<")
+            hasReplied = true
+          }
         }
-
-        if (rateLimit()) {
-          sendSanitized(channel, sentence)
+        case _ => {
+          if (writeToLog && !sender.contains("bot")) {
+            dict.train(message)
+            addToLog(logPath, message)
+          }
         }
-        else if (!hasReplied) {
-          sendMessage(channel, "leave me alone :<")
-          hasReplied = true
-        }
-      }
-      else if (writeToLog && !sender.contains("bot")) {
-        dict.train(message)
-        addToLog(logPath, message)
       }
     }
 
@@ -120,7 +130,7 @@ object SmartBot {
   }
 
   def main(args: Array[String]) {
-    val botName = sys.env.get("BOT_NAME").getOrElse("artemisphd")
+    val botName = sys.env.get("BOT_NAME").getOrElse("artemisphd-test")
     val channel = sys.env.get("CHANNEL").getOrElse("#csuatest")
     val server = sys.env.get("SERVER").getOrElse("irc.freenode.net")
     val logPath = sys.env.get("LOG_PATH").getOrElse("./irc_logs/csua.log")
@@ -128,6 +138,7 @@ object SmartBot {
     val rateLimit = sys.env.get("RATE_LIMIT").getOrElse("10").toInt
     val readOnly = sys.env.get("READ_ONLY").getOrElse("0")
     val passwordOpt = sys.env.get("PASSWORD")
+    val catchphrases = sys.env.get("CATCHPHRASES").getOrElse("0").split("/").map(MarkovDict.tokenize)
 
     val dict = MarkovDict.trainFromLog(logPath)
     println("finished training the bot")
@@ -137,6 +148,7 @@ object SmartBot {
       dict = dict,
       logPath = logPath,
       responseFrequency = responseRatio,
+      catchphrases = catchphrases,
       writeToLog = (readOnly == "0"),
       rateLimitMax = rateLimit
     )
